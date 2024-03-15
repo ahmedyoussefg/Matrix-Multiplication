@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <sys/time.h>
 
 #define MAX_SIZE 21
 
@@ -43,39 +44,35 @@ int main()
             scanf("%d", &b[i][j]);
         }
     }
+    struct timeval stop, start;
+    gettimeofday(&start, NULL); //start checking time
 
+    printf("Matrix C (thread per matrix)\n");        
     threadPerMatrix();
-    for (int i = 0; i < x; i++)
-    {
-        printf("[ ");
-        for (int j = 0; j < n; j++)
-        {
-            printf("%d ", c_per_matrix[i][j]);
-        }
-        printf("]\n");
-    }
+
+    gettimeofday(&stop, NULL); //end checking time
+    printf("Seconds taken %lu\n", stop.tv_sec - start.tv_sec);
+    printf("Microseconds taken: %lu\n", stop.tv_usec - start.tv_usec);
+
+
+    gettimeofday(&start, NULL); //start checking time
+    printf("Matrix C (thread per row)\n");     
+
     threadPerRow();
-    printf("\n");
-    for (int i = 0; i < x; i++)
-    {
-        printf("[ ");
-        for (int j = 0; j < n; j++)
-        {
-            printf("%d ", c_per_row[i][j]);
-        }
-        printf("]\n");
-    }
-    printf("\n");
+
+    gettimeofday(&stop, NULL); //end checking time
+    printf("Seconds taken %lu\n", stop.tv_sec - start.tv_sec);
+    printf("Microseconds taken: %lu\n", stop.tv_usec - start.tv_usec);
+
+
+    gettimeofday(&start, NULL); //start checking time
+    printf("Matrix C (thread per element)\n");   
+
     threadPerElement();
-    for (int i = 0; i < x; i++)
-    {
-        printf("[ ");
-        for (int j = 0; j < n; j++)
-        {
-            printf("%d ", c_per_element[i][j]);
-        }
-        printf("]\n");
-    }
+    
+    gettimeofday(&stop, NULL); //end checking time
+    printf("Seconds taken %lu\n", stop.tv_sec - start.tv_sec);
+    printf("Microseconds taken: %lu\n", stop.tv_usec - start.tv_usec);
 }
 
 void threadPerMatrix()
@@ -135,10 +132,14 @@ void threadPerElement()
     {
         for (int j = 0; j < col; j++)
         {
-            // concurrent computation of c[i][j]
             axes *curr_ptr = (axes *)malloc(sizeof(axes));
-            axes curr = {i, j};
-            *curr_ptr = curr;
+            if (curr_ptr == NULL)
+            {
+                printf("Memory allocation failed\n");
+                exit(1);
+            }
+            curr_ptr->i=i;
+            curr_ptr->j=j;
             pthread_create(&threads[i][j], NULL, computeElement, (void *)curr_ptr);
         }
     }
