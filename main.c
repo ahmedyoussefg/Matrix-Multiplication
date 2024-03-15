@@ -16,63 +16,85 @@ void threadPerRow();
 void threadPerElement();
 void *computeRow(void *ptr);
 void *computeElement(void *ptr);
+void readFromFile(FILE *file, int *rows, int *cols, int matrix[MAX_SIZE][MAX_SIZE]);
 typedef struct axes
 {
     int i;
     int j;
 } axes;
+
 int main()
 {
+    FILE *input_a=fopen("a.txt","r");
+    if(input_a==NULL)
+    {
+        printf("File first input not found\n");
+        exit(1);
+    }
+    readFromFile(input_a, &x, &y, a);
+    fclose(input_a);
+    FILE *input_b=fopen("b.txt","r");
+    if(input_b==NULL)
+    {
+        printf("File second input not found\n");
+        exit(1);
+    }
+    readFromFile(input_b, &m, &n, b);
+    fclose(input_b);
+
     printf("Matrix A dims: \n");
-    scanf("%d %d", &x, &y);
+    printf("%d %d\n", x, y);
     printf("Matrix B dims: \n");
-    scanf("%d %d", &m, &n);
+    printf("%d %d\n", m, n);
     printf("Matrix A\n");
 
     for (int i = 0; i < x; i++)
     {
         for (int j = 0; j < y; j++)
         {
-            scanf("%d", &a[i][j]);
+            printf("%d ", a[i][j]);
         }
+        printf("\n");
     }
     printf("Matrix B\n");
     for (int i = 0; i < m; i++)
     {
         for (int j = 0; j < n; j++)
         {
-            scanf("%d", &b[i][j]);
+            printf("%d ", b[i][j]);
         }
+        printf("\n");
     }
-    struct timeval stop, start;
-    gettimeofday(&start, NULL); //start checking time
 
-    printf("Matrix C (thread per matrix)\n");        
-    threadPerMatrix();
+    // struct timeval stop, start;
+    // gettimeofday(&start, NULL); //start checking time
 
-    gettimeofday(&stop, NULL); //end checking time
-    printf("Seconds taken %lu\n", stop.tv_sec - start.tv_sec);
-    printf("Microseconds taken: %lu\n", stop.tv_usec - start.tv_usec);
+    // printf("Matrix C (thread per matrix)\n");        
+    // threadPerMatrix();
 
-
-    gettimeofday(&start, NULL); //start checking time
-    printf("Matrix C (thread per row)\n");     
-
-    threadPerRow();
-
-    gettimeofday(&stop, NULL); //end checking time
-    printf("Seconds taken %lu\n", stop.tv_sec - start.tv_sec);
-    printf("Microseconds taken: %lu\n", stop.tv_usec - start.tv_usec);
+    // gettimeofday(&stop, NULL); //end checking time
+    // printf("Seconds taken %lu\n", stop.tv_sec - start.tv_sec);
+    // printf("Microseconds taken: %lu\n", stop.tv_usec - start.tv_usec);
 
 
-    gettimeofday(&start, NULL); //start checking time
-    printf("Matrix C (thread per element)\n");   
+    // gettimeofday(&start, NULL); //start checking time
+    // printf("Matrix C (thread per row)\n");     
 
-    threadPerElement();
+    // threadPerRow();
+
+    // gettimeofday(&stop, NULL); //end checking time
+    // printf("Seconds taken %lu\n", stop.tv_sec - start.tv_sec);
+    // printf("Microseconds taken: %lu\n", stop.tv_usec - start.tv_usec);
+
+
+    // gettimeofday(&start, NULL); //start checking time
+    // printf("Matrix C (thread per element)\n");   
+
+    // threadPerElement();
     
-    gettimeofday(&stop, NULL); //end checking time
-    printf("Seconds taken %lu\n", stop.tv_sec - start.tv_sec);
-    printf("Microseconds taken: %lu\n", stop.tv_usec - start.tv_usec);
+    // gettimeofday(&stop, NULL); //end checking time
+    // printf("Seconds taken %lu\n", stop.tv_sec - start.tv_sec);
+    // printf("Microseconds taken: %lu\n", stop.tv_usec - start.tv_usec);
 }
 
 void threadPerMatrix()
@@ -161,4 +183,15 @@ void *computeElement(void *ptr)
         c_per_element[i][j] += a[i][k] * b[k][j];
     }
     free(ptr);
+}
+void readFromFile(FILE *file, int *rows, int *cols, int matrix[MAX_SIZE][MAX_SIZE]) {
+    fscanf(file, "row=%d col=%d\n", rows, cols);
+    for (int i = 0; i < *rows; i++) {
+        for (int j = 0; j < *cols; j++) {
+            if (fscanf(file, "%d", &matrix[i][j]) != 1) {
+                perror("Error reading matrix");
+                exit(1);
+            }
+        }
+    }
 }
