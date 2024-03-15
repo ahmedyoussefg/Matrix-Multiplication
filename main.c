@@ -12,7 +12,13 @@ int c_per_element[MAX_SIZE][MAX_SIZE];
 int x,y,m,n;
 void threadPerMatrix();
 void threadPerRow();
+void threadPerElement();
 void* computeRow(void* ptr);
+void* computeElement(void* ptr);
+typedef struct axes {
+    int i;
+    int j;
+} axes;
 int main() {
     printf("Matrix A dims: \n");
     scanf("%d %d", &x, &y);
@@ -46,6 +52,15 @@ int main() {
         printf("[ ");
         for (int j =0;j <n;j++){
             printf("%d ", c_per_row[i][j]);
+        }
+        printf("]\n");
+    }
+    printf("\n");
+    threadPerElement();
+    for (int i =0;i<x;i++){
+        printf("[ ");
+        for (int j =0;j <n;j++){
+            printf("%d ", c_per_element[i][j]);
         }
         printf("]\n");
     }
@@ -86,6 +101,33 @@ void* computeRow(void* ptr){
         for (int k = 0; k < m; k++){
             c_per_row[curr_row][j] += a[curr_row][k] * b[k][j];
         }
+    }
+    free(ptr);
+}
+void threadPerElement(){
+    int row=x, col = n;
+    pthread_t threads[row][col];
+    for (int i = 0; i < row; i++){
+        for (int j = 0; j < col; j++){
+            // concurrent computation of c[i][j]
+            axes*curr_ptr = (axes *)malloc(sizeof(axes));
+            axes curr={i,j};
+            *curr_ptr=curr;
+            pthread_create(&threads[i][j], NULL, computeElement, (void *)curr_ptr);
+        }
+    }
+    for (int i=0;i<row;i++){
+        for (int j=0;j<col;j++){
+            pthread_join(threads[i][j], NULL);
+        }
+    }
+}
+void* computeElement(void* ptr){
+    axes*curr_ptr = (axes *)ptr;
+    int i = curr_ptr->i;
+    int j = curr_ptr->j;
+    for (int k = 0; k < m; k++){
+        c_per_element[i][j] += a[i][k] * b[k][j];
     }
     free(ptr);
 }
