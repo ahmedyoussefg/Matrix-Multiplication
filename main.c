@@ -7,13 +7,15 @@
 int a[MAX_SIZE][MAX_SIZE];
 int b[MAX_SIZE][MAX_SIZE];
 int c_per_matrix[MAX_SIZE][MAX_SIZE];
-
-void threadPerMatrix(int x, int y, int m, int n);
+int c_per_row[MAX_SIZE][MAX_SIZE];
+int c_per_element[MAX_SIZE][MAX_SIZE];
+int x,y,m,n;
+void threadPerMatrix();
+void threadPerRow();
+void* computeRow(void* ptr);
 int main() {
-    int x, y;
     printf("Matrix A dims: \n");
     scanf("%d %d", &x, &y);
-    int m, n;
     printf("Matrix B dims: \n");
     scanf("%d %d", &m , &n);
     printf("Matrix A\n");
@@ -30,7 +32,7 @@ int main() {
         }
     }
 
-    threadPerMatrix(x,y,m,n);
+    threadPerMatrix();
     for (int i =0;i<x;i++){
         printf("[ ");
         for (int j =0;j <n;j++){
@@ -38,9 +40,18 @@ int main() {
         }
         printf("]\n");
     }
+    threadPerRow();
+    printf("\n");
+    for (int i =0;i<x;i++){
+        printf("[ ");
+        for (int j =0;j <n;j++){
+            printf("%d ", c_per_row[i][j]);
+        }
+        printf("]\n");
+    }
 }
 
-void threadPerMatrix(int x, int y, int m, int n) {
+void threadPerMatrix() {
     int row=x, col = n;
     for (int i = 0; i < row; i++){
         for (int j = 0; j < col; j++){
@@ -49,4 +60,32 @@ void threadPerMatrix(int x, int y, int m, int n) {
             }
         }
     }
+}
+
+void threadPerRow() {
+    int row=x, col = n;
+    pthread_t threads[row];
+    for (int i = 0; i < row; i++){
+        int* ptr_to_i = (int *)malloc(sizeof(int));
+        if (ptr_to_i == NULL){
+            printf("Memory allocation failed\n");
+            exit(1);
+        }
+        *ptr_to_i=i;
+
+        pthread_create(&threads[i], NULL, computeRow, (void *)ptr_to_i);
+    }   
+    for (int i = 0; i < row; i++){
+        pthread_join(threads[i], NULL);
+    }
+}
+void* computeRow(void* ptr){
+    int *ptr_row= (int *)ptr;
+    int curr_row = *ptr_row;
+    for (int j = 0; j < y; j++){
+        for (int k = 0; k < m; k++){
+            c_per_row[curr_row][j] += a[curr_row][k] * b[k][j];
+        }
+    }
+    free(ptr);
 }

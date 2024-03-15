@@ -1,6 +1,8 @@
 # Prerequisites
 *.d
 .vscode
+main
+
 # Object files
 *.o
 *.ko
