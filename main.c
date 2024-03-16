@@ -95,6 +95,7 @@ int main(int argc, char *argv[])
     threadPerMatrix();
 
     gettimeofday(&stop, NULL); //end checking time
+    printf("Number Of Threads created: 1\n");
     printf("Seconds taken %lu\n", stop.tv_sec - start.tv_sec);
     printf("Microseconds taken: %lu\n", stop.tv_usec - start.tv_usec);
     printf("----------------------------------\n");
@@ -116,6 +117,8 @@ int main(int argc, char *argv[])
     threadPerRow();
 
     gettimeofday(&stop, NULL); //end checking time
+    printf("Number Of Threads created: %d\n", x);
+
     printf("Seconds taken %lu\n", stop.tv_sec - start.tv_sec);
     printf("Microseconds taken: %lu\n", stop.tv_usec - start.tv_usec);
     printf("----------------------------------\n");
@@ -138,6 +141,8 @@ int main(int argc, char *argv[])
     threadPerElement();
     
     gettimeofday(&stop, NULL); //end checking time
+    printf("Number Of Threads created: %d\n", x*n);
+
     printf("Seconds taken %lu\n", stop.tv_sec - start.tv_sec);
     printf("Microseconds taken: %lu\n", stop.tv_usec - start.tv_usec);
     FILE *output_by_element=fopen(outputs[2],"w");
