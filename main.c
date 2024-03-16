@@ -57,6 +57,8 @@ int main(int argc, char *argv[])
         for (int i =0;i < 3;i++)
             outputs[i]=argv[3];  
     }
+    char *name_of_output=malloc(strlen(outputs[0])+1);
+    strcpy(name_of_output,outputs[0]);
     for (int i=0;i<3;i++){
         char *new_output = malloc(strlen(outputs[i]) + strlen(suffixes[i]) + 1);
         if (new_output == NULL) {
@@ -91,7 +93,7 @@ int main(int argc, char *argv[])
     struct timeval stop, start;
     gettimeofday(&start, NULL); //start checking time
 
-    printf("Matrix C (thread per matrix)\n");        
+    printf("Matrix %s (thread per matrix)\n", name_of_output);        
     threadPerMatrix();
 
     gettimeofday(&stop, NULL); //end checking time
@@ -112,7 +114,7 @@ int main(int argc, char *argv[])
     fclose(output_by_matrix);
 
     gettimeofday(&start, NULL); //start checking time
-    printf("Matrix C (thread per row)\n");     
+    printf("Matrix %s (thread per row)\n", name_of_output);     
 
     threadPerRow();
 
@@ -136,7 +138,7 @@ int main(int argc, char *argv[])
     fclose(output_by_row);
 
     gettimeofday(&start, NULL); //start checking time
-    printf("Matrix C (thread per element)\n");   
+    printf("Matrix %s (thread per element)\n", name_of_output);   
 
     threadPerElement();
     
